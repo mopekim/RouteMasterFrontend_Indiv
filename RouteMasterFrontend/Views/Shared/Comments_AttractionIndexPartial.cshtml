@@ -141,7 +141,7 @@
                     <div class="d-flex">
                         <h4 class="card-title me-3">{{item.attractionName}}</h4>
                         <p class="me-auto fs-6 dateStyle">{{item.createDate}}</p>
-                        <a v-if="item.edit" data-bs-toggle="modal" data-bs-target="#exampleModal" class="pointer" style="color:black" @@click="labelComment(item.id)" data-bs-placement="bottom" title="檢舉">
+                        <a v-if="item.edit" :id="'icon'+item.id" data-bs-toggle="modal" data-bs-target="#exampleModal" class="pointer" style="color:black" @@click="labelComment(item.id)" data-bs-placement="bottom" title="檢舉">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
                                 <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
                             </svg>
@@ -472,9 +472,10 @@
                         .then(response => response.text()) // 使用 response.text() 獲取回傳的字串
                         .then(result => {
                             console.log(result); // 在控制台中輸出後端回傳的字串
-                            if (_this.comm.id == _this.commentid) {
-                                _this.comm.edit = false;
-                            }
+
+                            var icon = document.querySelector(`#icon${_this.commentid}`); 
+                            icon.style.display = "none"; //避免重複檢舉
+
                                 $('#exampleModal').modal('hide');
                             _this.sweetAlert();
 
@@ -602,6 +603,8 @@
                 _this.price="";
                 _this.content="";
                 file1.value="";
+                _this.preview_list=[];
+                _this.image_list=[];
               
             },
 
