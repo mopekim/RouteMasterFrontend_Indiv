@@ -1,0 +1,397 @@
+﻿@model RouteMasterFrontend.Models.ViewModels.Members.MemberRegisterVM
+
+@{
+    ViewData["Title"] = "MemberRegister";
+    //Layout = "_LayoutLogin";
+}
+
+@section Styles{
+    <style>
+        .img-container 
+        {
+            display: flex; /* 將內容水平排列 */
+            gap: 10px; /* 圖片之間的間距 */
+        }
+
+        .row {  
+            justify-content: center;
+        }
+
+        .col-md-4 {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .form-group{
+            margin-bottom:20px;
+        }
+
+        .radio-container{
+            display: inline-flex;
+            gap: 10px;
+        }
+        .h1Container{
+            display:flex;
+            justify-content:center;
+        }
+
+        .image-list li {
+            display: inline-block;
+            margin-right: 10px; 
+        }
+
+        .imagePreview{
+            display:flex;
+            height:100px;
+            width:100px;
+        }
+    </style>
+}
+<div class="h1Container">
+    <h1>會員註冊</h1>
+</div>
+
+<body>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="MemberRegister" class="form" id="registrationForm" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">               
+               
+                <input asp-for="FirstName" class="form-control" placeholder="名字" required/>
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <input asp-for="LastName" class="form-control" placeholder="姓氏"/>
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+               
+                <input asp-for="Account" class="form-control" placeholder="帳號名稱"/>
+                <span asp-validation-for="Account" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <input asp-for="Password" class="form-control" placeholder="密碼" pattern="[a-zA-z]{2}"/>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+               
+                <input asp-for="ConfirmPassword" class="form-control" placeholder="再輸入一次"/>
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <input asp-for="Email" class="form-control" placeholder="信箱"/>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <input asp-for="CellPhoneNumber" class="form-control" placeholder="電話"/>
+                <span asp-validation-for="CellPhoneNumber" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">              
+                <label>地區</label>
+
+                <input asp-for="Address" class="form-control" id="combinedAddress" style="display:none" />
+                <select asp-for="Address" id="region" name="Address" class="form-control">
+                    <option value="">請選擇</option>
+                    @foreach (var region in ViewBag.Regions)
+                    {
+                        <option value="@region.Id">@region.Name</option>
+                    }
+            
+                </select>
+                <select asp-for="Address" id="town" name="Address" class="form-control">
+                    <option value="">請先選縣市</option>
+                </select>
+                <span asp-validation-for="Address" class="text-danger"></span>        
+            </div>
+
+            <div class="form-group radio-container">
+            <label asp-for="Gender" class="control-label"></label>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input type="radio" class="form-check-input" asp-for="Gender" value="false" id="maleRadio"/> 男生
+                </label>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input type="radio" class="form-check-input" asp-for="Gender" value="true" /> 女生
+                </label>
+            </div>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            <br />
+            </div>
+            
+            <div class="form-group" form-check> 
+                <div class="form-check">
+                    <input type="radio" id="radioA" name="option" value="A"  >上傳大頭貼<br>
+                    <label  class="form-check-label" for="flexRadioDefault1">
+                        
+                    </label>
+                </div>
+                
+
+                <div class="form-check">
+                    <input type="radio" id="radioB" name="option" value="B" required>推薦大頭貼<br>
+                    <label class="form-check-label" for="flexRadioDefault2">
+                        
+                    </label>
+                </div>
+
+                <div class="form-group" id="divA" style="display: none;">
+                    <label asp-for="Image" class="control-label"></label>
+                    <input type="file" name="facePhoto" id="facePhotoInput" multiple="multiple" accept="image/*" />
+                    <input type="hidden" id="imageNameInput" name="ImageName" value="" />
+                        <div class="imagePreview" id="imagePreview"></div>
+                </div>
+
+                <div id="divB" style="display: none;">
+                    <h3>RouteMaster大頭貼</h3>
+                    <ul class="image-list">
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="2c36c1ae24444c9d92c5d94e5c69ee91.png" />
+                                <img src="~/SystemImages/2c36c1ae24444c9d92c5d94e5c69ee91.png" class="default-image imgs" alt="預設圖片 1" width="100" height="100" />
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="ff288dbbf8d3484ca88b6b086af3f2ac.png" />
+                                <img src="~/SystemImages/ff288dbbf8d3484ca88b6b086af3f2ac.png" class="default-image imgs" alt="預設圖片 2" width="100" height="100" />
+                            </label>
+                        </li>
+
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="4f411a319e2e4992a42db1e518238c7d.png" />
+                                <img src="~/SystemImages/4f411a319e2e4992a42db1e518238c7d.png" class="default-image imgs" alt="預設圖片 3" width="100" height="100" />
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="7bf343bdbd7541eeb3f86f018be90ddc.png" />
+                                <img src="~/SystemImages/7bf343bdbd7541eeb3f86f018be90ddc.png" class="default-image imgs" alt="預設圖片 4" width="100" height="100" />
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="c00e1205eb4e459eb9bc7fa2bdc94e00.png" />
+                                <img src="~/SystemImages/c00e1205eb4e459eb9bc7fa2bdc94e00.png" class="default-image imgs" alt="預設圖片 5" width="100" height="100" />
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="87df4dd9f26142008539267491e19a6c.png" />
+                                <img src="~/SystemImages/87df4dd9f26142008539267491e19a6c.png" class="default-image imgs" alt="預設圖片 6" width="100" height="100" />
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="radio" name="selectedImage" value="30519bf58a6d4eefa1b9d6c55d2d2f45.png" />
+                                <img src="~/SystemImages/30519bf58a6d4eefa1b9d6c55d2d2f45.png" class="default-image imgs" alt="預設圖片 7" width="100" height="100" />
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="radio"  name="selectedImage" value="eeb5e5041d534359b71e516aac29d46c.png" />
+                                <img src="~/SystemImages/eeb5e5041d534359b71e516aac29d46c.png" class="default-image imgs" alt="預設圖片 8" width="100" height="100" />
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+                <input type="hidden" id="sysImg" name="Image" />
+
+                <span asp-validation-for="Image" class="text-danger"></span>
+            </div>
+           
+
+            <div class="form-group">
+                <input type="submit" id="formSubmitBtn" value="註冊" class="btn btn-primary" />
+            </div>
+
+            <div>
+                <button type="button" id="quickRegiter">Demo</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+@*<div>
+    <a asp-action="Index">Back to List</a>
+</div>*@
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+ 
+    <script>
+        const radioA = document.getElementById("radioA");
+        const divA = document.getElementById("divA");
+        const radioB = document.getElementById("radioB");
+        const divB = document.getElementById("divB");
+        const fileInput = document.querySelector('input');
+        const imageInput = document.getElementById('facePhotoInput');
+        const imagePreview = document.getElementById('imagePreview');
+
+        radioA.addEventListener("click", function () {
+            // 隱藏 Div B 並顯示 Div A
+            divB.style.display = "none";
+            divA.style.display = "block";
+
+            facePhotoInput.disabled = false;
+        });
+
+        radioB.addEventListener("click", function () {
+            // 隱藏 Div A 並顯示 Div B
+            divA.style.display = "none";
+            divB.style.display = "block";
+
+            // 停用檔案輸入元素
+            facePhotoInput.disabled = true;
+            // 清除已選擇的檔案
+            facePhotoInput.value = "";
+            // 重設檔案輸入元素，以便再次選擇相同檔案時能觸發 change 事件
+            facePhotoInput.type = "text";
+            facePhotoInput.type = "file";
+
+            
+        });
+
+        $('input[name="selectedImage"]').click(function () {
+            // 取得選取的radio圖片的src屬性
+            var src = $(this).siblings('img.default-image').attr('src');
+
+            // 處理檔名
+            var nameAr = src.split('/');
+            var fileName = nameAr[nameAr.length - 1];
+
+            //alert(fileName);
+        $('#sysImg').val(fileName);
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            
+            const form = document.getElementById("registrationForm");
+            const quickRegiter = document.getElementById("quickRegiter");
+
+            quickRegiter.addEventListener("click", function () {
+                
+                const defaultData = {
+                    FirstName: "MasterDemo",
+                    LastName: "Route",
+                    Account: "RouteMaster",
+                    Password: "Aa0000",
+                    ConfirmPassword: "Aa0000",
+                    Email: "routemasterdemo@gmail.com",
+                    CellPhoneNumber: "0800123456", 
+                    Gender:"false",
+                };
+
+                //跑過每一個屬性並賦值               
+                for (const field in defaultData) {
+                    if (defaultData.hasOwnProperty(field)) {
+                        const inputField = form.querySelector(`[name="${field}"]`);
+                        if (inputField) {
+                            inputField.value = defaultData[field];
+                        }
+                    }
+                }
+
+                //Gender
+                const radioButtons = document.querySelectorAll('input[type="radio"][name="Gender"]');
+                radioButtons.forEach(radioButton => {
+                    if (radioButton.value === "true") {
+                        radioButton.checked = true;
+                    }
+                });
+
+                //Address
+                const selectElement = document.getElementById('region');
+                selectElement.value="臺北市";
+                //for (let i = 0; i < selectElement.options.length; i++) {
+                //    if (selectElement.options[i].value === "臺北市") {
+                //        selectElement.selectedIndex = i;
+                        
+                //        break;
+                //    }
+                //}
+
+
+            });
+        });
+
+        document.querySelector('#formSubmitBtn').addEventListener('click', function (e) {
+   
+            if (document.querySelector('#sysImg').value =="" && document.querySelector('#facePhotoInput').value==""){
+                swal("大頭貼尚未選擇!", "可以上傳或是選擇內建大頭貼哦!", "error", { button: "返回" });
+                e.preventDefault();
+            }     
+        })
+
+        imageInput.addEventListener('change', function () {
+            // 清空容器
+            imagePreview.innerHTML = '';
+            
+            //放進預覽
+            
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(imageInput.files[0]); 
+            console.log(img.src);
+            img.classList.add('preview-image');
+            imagePreview.appendChild(img); 
+            
+        });
+
+        document.addEventListener("DOMContentLoaded",function(){
+            document.querySelector("#region").addEventListener("change",function(){
+                var regionId = parseInt(document.querySelector("#region").value);
+                var townDropdown = document.getElementById("town");
+                townDropdown.innerHTML = "";
+
+                console.log(regionId);
+
+                fetch("https://localhost:7145/Members/ShowTownSelect", {
+
+                method:"POST",
+                body: JSON.stringify(regionId),
+                headers: { 'Content-Type': 'application/json' },
+               
+                }).then(response => response.json())
+                .then(data=>{
+                        data.forEach(function (town) {
+                        var option = document.createElement("option");
+                        option.value = town.townId;
+                        option.textContent = town.name;
+                        townDropdown.appendChild(option);
+                        });
+                })
+                .catch(error => {
+                 console.error("An error occurred:", error);
+               });
+
+                
+            });
+        });
+
+        const regionSelect = document.getElementById('region');
+        const townSelect = document.getElementById('town');
+        const combinedAddressInput = document.getElementById('combinedAddress');
+
+        regionSelect.addEventListener('change', updateCombinedAddress);
+        townSelect.addEventListener('change', updateCombinedAddress);
+
+        function updateCombinedAddress() {
+            const selectedRegion = regionSelect.options[regionSelect.selectedIndex].text;
+            const selectedTown = townSelect.options[townSelect.selectedIndex].text;
+
+            const combinedAddress = `${selectedRegion}${selectedTown}`;
+            combinedAddressInput.value = combinedAddress;
+        }
+    </script>
+}

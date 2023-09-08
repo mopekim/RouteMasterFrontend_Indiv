@@ -1,0 +1,143 @@
+﻿@model IEnumerable<RouteMasterFrontend.Models.Dto.OrderDto>
+
+@{
+    ViewData["Title"] = "HistoryOrder";
+}
+@{
+    var memberIdCookie = Context.Request.Cookies["Id"];
+
+}
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<h1>我的訂單</h1>
+
+<style>
+    .main-table {
+        border-collapse: separate;
+        border-spacing: 0 0.5rem;
+    }
+
+    .main-table thead tr {
+        background-color: #007BFF;
+        color: white;
+    }
+
+    .main-table tbody tr:nth-child(odd) {
+        background-color: #f2f2f2;
+    }
+
+    .details-table {
+        margin: 0.5rem 0;
+        box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+    }
+
+    .details-table th {
+        background-color: #e9ecef;
+    }
+
+    .details-table tbody tr:nth-child(odd) {
+        background-color: #ffffff;
+    }
+</style>
+
+<table class="table main-table">
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            Order for @Html.DisplayFor(modelItem => item.MemberId)
+                        </div>
+                        <div class="card-body">
+
+                            @foreach (var service in item.ExtraServiceDetails)
+                            {
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <img src="@Url.Content(service.ImageUrl)" alt="圖片" class="img-fluid" style="height:auto;";  />
+                                    </div>
+                                    <div class="col-md-9">
+                                        <h5 class="card-title">@service.ExtraServiceName</h5>
+                                        <p class="card-text">
+                                            日期: @service.Date<br />
+                                            價格: @service.Price<br />
+                                            數量: @service.Quantity
+                                        </p>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- 活動資料 -->
+                            @foreach (var activity in item.ActivityDetails)
+                            {
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <img src="@Url.Content(activity.ImageUrl)" alt="圖片" class="img-fluid" style="height: auto;" />
+                                    </div>
+                                    <div class="col-md-9">
+                                        <h5 class="card-title">@activity.ActivityName</h5>
+                                        <p class="card-text">
+                                            日期: @activity.Date<br />
+                                            時間: @activity.StartTime - @activity.EndTime<br />
+                                            數量: @activity.Price
+                                        </p>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- 住宿資料 -->
+                            @foreach (var accommodation in item.AccommodationDetails)
+                            {
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <img src="@Url.Content(accommodation.ImageUrl)" alt="圖片" class="img-fluid" style="height: auto;" />
+                                    </div>
+                                    <div class="col-md-9">
+                                        <h5 class="card-title">@accommodation.AccommodationName</h5>
+                                        <p class="card-text">
+                                            房型: @accommodation.RoomName<br />
+                                            Check-In: @accommodation.CheckIn<br />
+                                            Check-Out: @accommodation.CheckOut
+                                        </p>
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-between">
+                                <span>Payment Status: @Html.DisplayFor(modelItem => item.PaymentStatusName)</span>
+                                <span>Order Created: @Html.DisplayFor(modelItem => item.CreateDate)</span>
+                                <button class="btn btn-primary" onclick="generatePDF(this)">生成PDF</button>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+
+</table>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+<script>
+    function generatePDF(buttonElement) {
+      
+        var cardElement = buttonElement.closest(".card");
+
+        buttonElement.style.display = "none"; 
+
+        var opt = {
+            margin: [15, 10, 10, 10],
+            filename: 'order-details.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().from(cardElement).set(opt).save().then(function () {
+            buttonElement.style.display = "block"; 
+        });
+    }
+</script>

@@ -1,0 +1,187 @@
+﻿@model IEnumerable<RouteMasterFrontend.EFModels.Cart_ExtraServicesDetail>
+@section style{
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+
+
+}
+<style>
+  /* Add this style to remove border lines */
+    #cartTable tbody tr {
+        border-top: none; /* Remove border above each row */
+        border-bottom: none;
+    }
+
+    /* Optional: Add padding to the cells for better spacing */
+    #cartTable tbody td {
+        padding: 8px;
+        border:none;
+    }
+
+    /* Add this style to remove border between thead and tbody */
+    #cartTable thead th {
+        border-bottom: none;
+        border-top: none;
+    }
+
+    .extraservices-container-vertical {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* 將元素靠左對齊 */
+        gap: 20px; /* 設定元素之間的間距 */
+    }
+
+    .extraservice-item {
+        width: 350px;
+        /* 其他樣式設定 */
+    }
+
+    .extraservice-image img:hover {
+        transform: scale(1.2); 
+        transition: transform 0.3s ease-in-out; 
+    }
+</style>
+<head>
+    <meta name="viewport" content="width=device-width" />
+   @* <title>My Razor View</title>*@
+    <script src="https://kit.fontawesome.com/c3bf7d3bbb.js" crossorigin="anonymous"></script>
+</head>
+
+@*<p>
+    <a asp-action="Create">Create New</a>
+</p>*@
+<div style="display: flex; justify-content: center;">
+<div class="partial-view-container" style="width: 100%;">
+        <table class="table mb-0 border-bottom" id="cartTable" style="width:100%;">
+        <tbody>
+            @{
+                var groupitems = Model.GroupBy(item => item.ExtraServiceProduct.Id);
+            }
+
+            <tr>
+                <td colspan="6">
+                    <div class="extraservices-container-vertical">
+                        <h2>服務</h2>
+                        @foreach (var group in groupitems)
+                        {
+                            var firstItem = group.First();
+                            <div class="extraservice-item w-100" data-extraserviceid="@firstItem.Id">
+                                <div class="extraservice-info row">
+                                    <div class="room-left col-md-5">
+                                        <div class="room-image">
+                                            <img src="~/ExtraServiceImages/@firstItem.ExtraServiceProduct.ExtraService.Image" alt="圖片" style="max-width: 100%; height: auto;">
+                                        </div>
+                                    </div>
+                                    <div class="room-right col-md-6">
+                                        <div class="room-name" style=" font-weight:bold; font-size:18px;">
+                                            @Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.ExtraService.Name)
+                                        </div>
+                                       @* <div>
+                                            @Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.ExtraService.Description)
+                                        </div>*@
+                                        <div class="extraservice-date" style="font-size:14px;margin-bottom: 5px;">
+                                            日期：<span class="date">@Html.DisplayFor(modelItem => firstItem.ExtraServiceProduct.Date)</span>
+                                        </div>
+                                        <div class="extraservice-quantity" style="font-size:14px;color:dimgrey;margin-bottom: 5px;">
+                                            數量:<span class="quantity">@group.Sum(item => item.Quantity)</span>
+                                        </div>
+                                        <div class="extraservice-price" style="font-size:18px; color:lightseagreen; font-weight:bold;">
+                                            @String.Format("{0:C0}",group.Sum(item=>item.Quantity * firstItem.ExtraServiceProduct.Price))
+                                           
+                                        </div>
+                                    </div>
+                                    <div class="room-remove col-md-1 p-0" style="text-align: left;">
+                                            <a href="#"><i class="fas fa-trash-can" style="font-size: 18px;" onclick="removeFromCartExt(@firstItem.Id)"></i></a>
+
+                                    </div>
+@*
+                                    <div class="extraservice-left col-md-3">
+                                        <div class="extraservice-image">
+                                        </div>
+                                    </div>
+                                    <div class="extraservice-right col-md-8">
+                                        <div class="extraservice-name" style="margin-left: 40px; font-weight: bold; font-size: 18px;">
+                                        </div>
+                                            <div class="extraservice-describtion" style="margin-left:40px;font-size:16px;margin-bottom: 5px;">
+                                        </div>
+                                            <div class="extraservice-date" style="margin-left:40px;font-size:14px;color:dimgrey;margin-bottom: 5px;">
+                                        </div>
+                                            <div class="extraservice-quantity" style="margin-left:40px;font-size:14px;color:dimgrey;margin-bottom: 5px;">
+                                                
+
+                                            </div>
+                                            <div class="extraservice-price" style="margin-left:40px;font-size:18px; color:lightseagreen; font-weight:bold;">
+                                            </div>
+                                    </div>
+                                    <div class="extraservice-remove col-md-1" style="text-align: right;">
+                                        <div style="margin-right: 25px;">
+                                                <button data-itemid="@firstItem.Id" class="btn btn-link">
+                                                <i class="fas fa-trash-can"style="font-size: 18px;"></i>
+                                            </button>
+                                        </div>
+                                    </div>*@
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    
+                </td>
+
+            </tr>
+        </tbody>
+</table>
+</div>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).on('click', '.extraservice-remove button', function (button) {
+        button.preventDefault();
+        const extraserviceId = $(this).data('itemid');
+        removeFromCartExt(extraserviceId);
+    });
+</script>
+<script>
+    function removeFromCartExt(extraserviceId) {
+      
+        // 發送 AJAX 請求
+        $.ajax({
+            url: '/Carts/RemoveExtraServiceFromCart',
+            type: 'POST',
+            data: {extraserviceId: extraserviceId },
+            success: function (result) {
+                if (result.success) {                    
+                    alert(result.message);
+                    $('.extraservice-item[data-extraserviceid="' + result.extraserviceId + '"]').remove();
+                    reloadCartItems();
+                } else {
+                    // 失敗時的處理
+                    alert(result.message);
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert('發生錯誤，無法刪除項目。');
+                console.error("AJAX Error:", textStatus, errorThrown);  
+            }
+        });
+    }
+    function reloadCartItems() {
+        $.ajax({
+            url: '/Carts/RefreshCart',
+            type: 'GET',
+            success: function (data) {
+
+                $('#Cart').html(data);
+            },
+
+
+            error: function () {
+                alert('Failed to reload cart items.');
+            }
+        });
+    }
+
+   
+
+</script>
+

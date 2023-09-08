@@ -1,0 +1,33 @@
+﻿
+<button class="btn btn-warning" id="getOrder">歷史訂單</button>
+
+<table>
+    <tr>
+        <td>id</td>
+        <td>paymentStatusId</td>
+        
+
+    </tr>
+
+
+</table>
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        var memberId = "1";
+        document.querySelector('#getOrder').addEventListener('click',function(){
+            alert("dfdf");
+
+            $.ajax({
+                type: "GET",
+                url: `https://localhost:7251/api/Members/${memberId}`
+            }).done(data => {
+                alert(JSON.stringify(data));
+            }).fail(err => {
+                alert(err.statusText);
+            });
+
+        });
+        
+    </script>

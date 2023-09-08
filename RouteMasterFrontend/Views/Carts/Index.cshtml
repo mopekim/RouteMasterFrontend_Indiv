@@ -1,0 +1,538 @@
+﻿@model RouteMasterFrontend.Models.Dto.CartDetailDto
+
+@section Styles{
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .step-container {
+            display: flex;
+            justify-content: space-between;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .step {
+            width: 32%;
+            text-align: center;
+        }
+
+        .step .circle {
+            background-color: #ccc;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            line-height: 30px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .step.active .circle {
+            background-color: #007bff;
+        }
+
+        .table thead th {
+            vertical-align: bottom;
+           
+        }
+        .step-divider {
+            flex-grow: 1;
+            height: 2px;
+            background-color: #ccc;
+            position: relative;
+            top: 15px;
+        }
+
+        .step-divider.active {
+            background-color: #007bff;
+        }
+        .custom-container {
+            background-color: white;
+            padding: 10px;
+            border: 1px solid white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .fixed-row-height tr {
+            height: 100px;
+            border-top:none;
+            font-size: 14px;
+        }
+
+        .fixed-row-height thead th {
+            font-weight: bold;
+            font-size: 1px;
+            color: #246;
+            font-size: 16px;
+        }
+
+        .fixed-row-height thead tr:last-child {
+            border-bottom: 0.5px solid #ccc; 
+        }
+     
+
+        .fixed-row-height tbody td,
+        .fixed-row-height tbody th {
+            border-color: lightgrey;
+            border-top:none;
+        }
+
+    </style>
+
+}
+<div class="container mt-5">
+    <div class="step-container">
+        <div class="step active">
+            <div class="circle">1</div>
+            <span>購物車</span>
+        </div>
+        <div class="step-divider active"></div>
+        <div class="step">
+            <div class="circle">2</div>
+            <span>付款訊息</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step">
+            <div class="circle">3</div>
+            <span>確認訂單</span>
+        </div>
+    </div>
+</div>
+
+
+<div id="app">
+    <div class="modal" id="errorModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">交易失敗</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                   交易失敗，請重新再試一次。
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" id="closeModalButton" class="btn btn-danger" data-dismiss="modal">關閉</button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+<div id="collapseOne" class="collapse show" style="margin-top:20px;" aria-labelledby="headingOne">
+    <div class="card-body">
+        <div class="container custom-container">
+            <!-- ExtraServices -->
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-hover fixed-row-height" style="vertical-align: middle; align-items: center; border-color:white; ">
+                    <colgroup style="border-top:none;">
+                            <col style="width: 100px;" />
+                            <col style="width: auto;" />
+                            <col style="width: auto;" />
+                            <col class="col-md-2" /> 
+                            <col class="col-md-2" />
+                            <col class="width: auto" />
+                            <col class="col-md-2" />
+                            </colgroup>
+                    <thead style="border-top:none;">
+                                <tr style="border-top: none; border-bottom: 1px solid #ccc;">
+                                    <th class=" border-top-0"></th>
+                                    <th class="align-middle text-center border-top-0" >名稱</th>
+                                    <th class="align-middle text-center border-top-0">描述</th>
+                                    <th class="align-middle text-center border-top-0">日期</th>
+                                    <th class="align-middle text-center border-top-0">價格</th>
+                                    <th class="align-middle text-center border-top-0">數量</th>
+                                    <th class=" border-top-0"></th>
+                                    <th></th>
+                                </tr>
+                    </thead>
+                    <tbody>
+                            @{
+                                decimal totalAmount = 0;
+                               int totalAmountInt = (int)totalAmount;
+
+                                var groupedExtraServices = Model.ExtraServices
+                                .GroupBy(e => e.Id);
+                            }
+                            @foreach (var group in groupedExtraServices)
+                            {
+                                decimal groupPrice = group.Sum(item => item.Quantity * item.Price);
+                                totalAmount += groupPrice;
+                                <tr data-extraservice-id="@group.First().Id">
+                                     <td><img src="@Url.Content(@group.First().ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
+
+                                    <td class="align-middle text-center">@group.First().Name</td>
+                                        <td class="align-middle text-center">@(group.First().Description.Length > 10 ? group.First().Description.Substring(0, 10) + "..." : group.First().Description)</td>
+                                    <td class="align-middle text-center">@group.First().Date</td>
+                                    <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">
+                                     @String.Format("{0:C0}",group.Sum(item=>item.Quantity * item.Price))
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <span class="quantity">@group.Sum(item => item.Quantity)</span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                            <a href="#"><i class="fas fa-trash-can" style="font-size: 18px;" @@click="removeItem('@group.First().Id', '@groupPrice')"></i></a>
+                                    </td>
+
+                                </tr>
+                            }
+                        @foreach (var accommodationDTO in Model.Accommodations)
+                        {
+                                totalAmount += accommodationDTO.Price * accommodationDTO.Quantity;
+                                <tr data-roomProductId="@accommodationDTO.RoomId">
+                                <td><img src="../AccommodationImages/@Url.Content(accommodationDTO.ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
+                                <td class="align-middle text-center">@accommodationDTO.AccommodationName</td>
+                                        <td class="align-middle text-center">@accommodationDTO.RoomName <br />@accommodationDTO.RoomTypeName</td>
+                                <td class="align-middle text-center">@accommodationDTO.Date</td>
+                                        <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">NT$@String.Format("{0:N0}", accommodationDTO.Price)</td>
+
+                                <td class="align-middle text-center">@accommodationDTO.Quantity</td>
+                                <td class="align-middle text-center">
+                                    <a href="#"><i class="fas fa-trash-can" style="font-size: 18px;" @@click="removeFromAcc(@accommodationDTO.RoomId, @accommodationDTO.Price)"></i></a>
+                                </td>
+                            </tr>
+                        }
+
+                            @{
+                                var groupActivities = Model.Activities
+                                .GroupBy(e => e.Id);
+                            }
+                            @foreach (var group in groupActivities)
+                        {
+                                decimal groupPrice = group.Sum(item => item.Quantity * item.Price);
+                                totalAmount += groupPrice;
+                                <tr data-activity-id="@group.First().Id">
+                                        <td><img src="@Url.Content(@group.First().ImageUrl)" alt="圖片" style="max-width: 100px; max-height: 100px;" /></td>
+                                        <td class="align-middle text-center">@group.First().ActivityName</td>
+                                        <td class="align-middle text-center">@(group.First().Description.Length > 14 ? group.First().Description.Substring(0, 10) + "..." : group.First().Description)</td>
+                                        <td class="align-middle text-center">@group.First().StartTime ~ @group.First().EndTime </td>
+                                        <td class="align-middle text-center" style="font-weight: bold; color: lightseagreen;">
+                                            @String.Format("{0:C0}",group.Sum(item=>item.Quantity * item.Price))
+                                            </td>
+                                   
+                                        <td class="align-middle text-center">
+                                            <span class="quantity">@group.First().Quantity</span>
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            <a href="#"><i class="fas fa-trash-can" style="font-size: 18px;" @@click="removeFromCartAct('@group.First().Id',@groupPrice)"></i></a>
+                                        </td>
+                                </tr>
+                        }
+                    </tbody>
+                    
+                </table>
+
+
+                        <input type="hidden" id="selectedCouponId" name="CouponsId" value="" />
+                <div class="d-flex justify-content-end">
+                            <button class="btn btn-outline-secondary" @@click="goToCheckout">
+                        <i class="fas fa-shopping-cart"></i>前往結帳
+
+                    </button>
+              
+                   </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+   </div>
+
+
+
+
+ 
+
+
+@*<input type="hidden" id="selectedCouponId" name="selectedCouponId" />*@
+<div class="card-body d-flex" >
+        <div class="container custom-container ms-0" style="width:60%">
+        @*    @await Html.PartialAsync("Coupons")*@
+
+
+            <div v-for="(coupon, index) in coupons" class="border border-warning rounded my-2 p-3 d-flex" :class="{'border-3': coupon.Selected}">
+
+                    <div class=" justify-content-center align-items-center d-flex">
+                        <h1><i class="fa-solid fa-gift" style="color:orange"></i></h1>
+                    </div>
+                    <div class="ms-3 me-auto">
+                        <h5>{{ coupon.Name }}</h5>
+                        <h3>折扣數 : {{ coupon.Discount }}% off !!</h3>
+                        <h5 style="color: lightseagreen;">有效日期 : {{ coupon.StartDateText }} 至 {{ coupon.EndDateText }}</h5>
+                        <p v-if="!coupon.Valuable" style="color:orangered"><i class="fa-regular fa-face-frown"></i> <strong>抱歉，這張優惠券目前無法使用，請確認有效日期。</strong></p>
+                    </div>
+                    <div class=" justify-content-center align-items-center d-flex">
+                        <button :disabled="!coupon.Valuable" :class="{'btn': true, 'btn-warning': !coupon.Selected, 'btn-danger': coupon.Selected}" v-on:click="UseCoupon(index)">
+                            <i class="fa-solid" :class="{'fa-truck-fast': !coupon.Selected, 'fa-check-circle': coupon.Selected}"></i>
+                            {{ coupon.Selected ? '優惠券已選取' : '使用優惠券' }}
+                        </button>
+                    </div>
+
+            </div>
+
+       
+        </div>
+        <div style="width:38%; border:none; text-align:center; align-items:flex-end; justify-content: center; display: flex; flex-direction: column; background-color: #f9f9f9; border-radius: 10px; padding: 20px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1);" class="container me-0">
+            <h5 style="font-size: 24px; margin-bottom: 20px;">小計總金額: NT ${{Math.round(totalAmount).toLocaleString()}} 元</h5>
+            <div style="border-top: 2px dashed #ddd; padding-top: 20px; width:300px; text-align: right;">
+                <h3 style="font-size: 18px; color: #888; margin-bottom: 10px;">優惠券折扣：{{ selectedCouponAmount}}%</h3>
+                <h3 style="font-size: 18px; color: #888; margin-bottom: 20px;">優惠券折扣金額：NT ${{ Math.round(totalAmount * (selectedCouponAmount / 100)).toLocaleString() }} 元</h3>
+            </div>
+            <h5 style="color: lightseagreen; font-size: 26px; font-weight: bold;">總金額: NT$ {{ Math.round(discountedTotal).toLocaleString() }} 元</h5>
+        </div>
+</div>
+</div>
+
+
+@section Scripts{
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://unpkg.com/vue@3.2.36/dist/vue.global.js"></script>
+    <script src="https://kit.fontawesome.com/0295eb5403.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+   
+    <script>
+        var initialTotalAmount = @totalAmount;
+    </script>
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    coupons: [],
+                    totalAmount: initialTotalAmount,
+                    selectedCouponAmount: 0,
+                    usingCouponId: 0, 
+                  
+                };
+            },
+            computed: {
+                discountedTotal() {
+                    const discountFactor = this.selectedCouponAmount / 100;
+                    const discountedAmount = this.totalAmount * discountFactor;
+                    return this.totalAmount - discountedAmount;
+                }
+            },
+            mounted() {
+                this.ShowCoupons();
+                console.log("Initial totalAmount:", this.totalAmount);
+            },
+            methods: {
+                async ShowCoupons() {
+                    try {
+                        const uri = "https://localhost:7145/Coupons/GetAllCoupons";
+                        const response = await fetch(uri, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({})
+                        });
+                        if (response.ok) {
+                            this.coupons = await response.json();
+                            console.log(this.coupons[0]);
+                        } else {
+                            console.error('Error:', response.status);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                },
+                UseCoupon(index) {
+                    console.log("use coupon");
+                    this.selectedCouponAmount = 0;
+                    this.coupons.forEach((coupon, i) => {
+                        if (i !== index) {
+                            coupon.Selected = false;
+                        }
+                    });
+                    this.coupons[index].Selected = !this.coupons[index].Selected;
+
+                    const selectedCouponId = this.coupons[index].Id;
+                    //this.usingCouponId = this.coupons[index].Id;
+
+                    if (this.coupons[index].Selected) {
+                        this.selectedCouponAmount = this.coupons[index].Discount;
+                        console.log("Selected Coupon ID:", selectedCouponId);
+                        console.log("Selected Coupon Amount:", this.selectedCouponAmount);
+                        this.usingCouponId = selectedCouponId;
+                        console.log(this.usingCouponId);
+                        document.getElementById("selectedCouponId").value = selectedCouponId;
+                    } else {
+                        document.getElementById('selectedCouponId').value = '';
+                    }
+                },
+                goToCheckout:function(){
+                    const url = `/Carts/Checkout/${this.usingCouponId}`;
+                    window.location.href = url;
+                },
+                removeItem: function (extraserviceId, itemPrice) {
+                    let _this = this;
+                    $.ajax({
+                        url: '/Carts/RemoveExtraServiceFromCart',
+                        type: 'POST',
+                        data: { extraserviceId: extraserviceId },
+                        success: function (result) {
+                            if (result.success) {
+                                alert(result.message);
+                                $(`tr[data-extraservice-id=${extraserviceId}]`).remove();
+
+                                const price = parseFloat(itemPrice);
+                                if (!isNaN(price)) {
+                                    _this.totalAmount -= price;
+                                }
+
+                                reloadCartItems();
+
+                            } else {
+                                alert(result.message);
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert('發生錯誤，無法刪除項目。');
+                            console.error("AJAX Error:", textStatus, errorThrown);
+                        }
+                    });
+                },
+                removeFromCartAct:function (activitiesId, itemPrice) {
+                    let _this = this;
+                    $.ajax({
+                        url: '/Carts/RemoveActivitiesFromCart',
+                        type: 'POST',
+                        data: { activitiesId: activitiesId },
+                        success: function (result) {
+                            if (result.success) {
+
+                                alert(result.message);
+                                $(`tr[data-activity-id=${activitiesId}]`).remove();
+
+                                  const price = parseFloat(itemPrice);
+                                if (!isNaN(price)) {
+                                    _this.totalAmount -= price;
+                                }
+
+                                reloadCartItems();
+                            } else {
+
+                                alert(result.message);
+                            }
+                        },
+                        error: function () {
+                            // 發生錯誤時的處理
+                            console.log('66666')
+                            alert('發生錯誤，無法刪除項目。');
+                        }
+                    });
+                },
+                 removeFromAcc:function(roomProductId, itemPrice) {
+                     let _this = this;
+                    $.ajax({
+                        url: '/Carts/RemoveAccommodationFromCart',
+                        type: 'POST',
+                        data: { roomProductId: roomProductId },
+                        success: function (result) {
+                            if (result.success) {
+                                alert(result.message);
+
+                                console.log(roomProductId)
+                                $(`tr[data-roomproductid=${roomProductId}]`).remove();
+                                const price = parseFloat(itemPrice);
+                                if (!isNaN(price)) {
+                                    _this.totalAmount -= price;
+                                }
+                                reloadCartItems();
+                            } else {
+                                alert(result.message);
+                            }
+                        },
+                        error: function () {
+                            console.log('66666');
+                            alert('An error occurred, unable to delete item.');
+                        }
+                    });
+                }
+
+            
+
+               
+            }
+        });
+
+        const appInstance = app.mount("#app");
+    </script>
+    <script>
+
+        //function removeItem(extraserviceId, itemPrice) {
+        //    $.ajax({
+        //        url: '/Carts/RemoveExtraServiceFromCart',
+        //        type: 'POST',
+        //        data: { extraserviceId: extraserviceId },
+        //        success: function (result) {
+        //            if (result.success) {
+        //                alert(result.message);
+        //                $(`tr[data-extraservice-id=${extraserviceId}]`).remove();
+
+        //                const price = parseFloat(itemPrice);
+        //                if (!isNaN(price)) {
+        //                    const currentTotal = parseFloat($('.total-price').text());
+        //                    const updatedTotal = currentTotal - price;
+
+        //                    $('.total-price').text(updatedTotal.toFixed(2));
+        //                }
+
+        //                reloadCartItems();
+
+        //            } else {
+        //                alert(result.message);
+        //            }
+        //        },
+        //        error: function (jqXHR, textStatus, errorThrown) {
+        //            alert('發生錯誤，無法刪除項目。');
+        //            console.error("AJAX Error:", textStatus, errorThrown);
+        //        }
+        //    });
+        //}
+
+        function reloadCartItems() {
+            console.log("reload")
+            $.ajax({
+                url: '/Carts/RefreshCart',
+                type: 'GET',
+                success: function (data) {
+                    console.log(data);
+                    console.log($('#Cart'))
+                    $('#Cart').html(data);
+                },
+
+
+                error: function () {
+                    alert('Failed to reload cart items.');
+                }
+            });
+        }
+        
+    </script>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <script>
+            $(document).ready(function () {
+                $('#errorModal').modal('show');
+            });
+        $('#closeModalButton').click(function () {
+                $('#errorModal').modal('hide');
+            });
+        </script>
+    }
+}
+     
+
+       
+
+                

@@ -1,0 +1,56 @@
+﻿@{
+    var memberCookie = Context.Request.HttpContext;
+    var imageCookieValue = memberCookie.User.FindFirst("memberImage");
+    string imagePath = !string.IsNullOrEmpty(imageCookieValue?.Value) ? $"~/MemberUploads/{imageCookieValue.Value}" : "~/SystemImages/2c36c1ae24444c9d92c5d94e5c69ee91";
+}
+
+<style>
+    .fixed-memberphoto {
+        position: fixed;
+        top: 50%;
+        right: 100px;
+        transform: translate(0, -50%);
+        width: 100px; 
+        height: 100px;
+    }
+
+    .fixed-memberphoto img {
+        width: 100%; /* Make sure the image takes up the full width of the container */
+        height: 100%; /* Make sure the image takes up the full height of the container */
+        /*border-radius: 50%;*/
+    }
+
+    .fixed-memberphoto .member-link {
+        text-align: center; 
+        width:100px;
+        height:100px;
+    }
+</style>
+
+
+
+<nav class="navbar">
+    <div class=" collapse navbar-collapse ">
+        <ul class="navbar-nav ">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Home </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+@{
+    if (User.Identity.IsAuthenticated)
+    {
+        <div class="fixed-memberphoto">
+            <div class="member-link">
+                <a href="https://localhost:7145/Members/MemberChangePhoto">
+                <img src="@Url.Content(imagePath)" alt="會員圖片" class="member-image" />
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div></div>
+    }
+}
